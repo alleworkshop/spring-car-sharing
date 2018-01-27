@@ -19,17 +19,7 @@ import static java.lang.Long.parseLong;
  * This is a simple example of how to get started with Structurizr for Java.
  */
 public class Structurizr {
-    /**
-     * Events:
-     * Car is rented
-     * Car is returned
-     * Car is parked
-     * Distance x travelled on car y
-     * Billing sent
-     * Car located
-     *
-     *
-     */
+
     public static void main(String[] args) throws Exception {
         // a Structurizr workspace is the wrapper for a software architecture model, views and documentation
         Workspace workspace = new Workspace("Getting Started", "This is a model of my software system.");
@@ -39,28 +29,46 @@ public class Structurizr {
         Person driver = model.addPerson("Driver", "A user that rents and drives a car");
         SoftwareSystem users = model.addSoftwareSystem(
                 "users", "Responsible for authentication, authorization and user profiles");
-        SoftwareSystem locator = model.addSoftwareSystem("locator", "Resposnible for locating cars");
-        SoftwareSystem cars = model.addSoftwareSystem("cars", "Resposnible for car catalog");
-        SoftwareSystem rental = model.addSoftwareSystem("rental", "Responsible for renting of cars");
-        SoftwareSystem billing = model.addSoftwareSystem("billing", "Responsible for calculating cost");
+        SoftwareSystem locator = model.addSoftwareSystem("locator", "Responsible for locating cars and calculating distance (no storage)");
+        SoftwareSystem cars = model.addSoftwareSystem("cars", "Responsible for car catalog (DB)");
+        SoftwareSystem rental = model.addSoftwareSystem("rental", "Responsible for renting of cars (DB)");
+        SoftwareSystem billing = model.addSoftwareSystem("billing", "Responsible for calculating cost (DB)");
+        SoftwareSystem search = model.addSoftwareSystem("search", "Responsible for searching nearby free cars");
+        SoftwareSystem availability = model.addSoftwareSystem("availability", "Responsible for information whether car is available or not (DB)");
+        SoftwareSystem mailing = model.addSoftwareSystem("mailing", "Sending mails to users");
 
-        driver.uses(locator, "User searches for a car nearby");
-        driver.uses(cars, "User browses car details");
+
+        Person gps = model.addPerson("Gps", "Gps in a physical car");
+        gps.uses(locator, "send position and id");
+
+        driver.uses(search, "User searches for a car nearby");
+
+        search.uses(cars, "Get details of a car by gpsId");
+        search.uses(availability, "which of those are available");
+
         driver.uses(rental, "User rents a car");
         driver.uses(rental, "User returns a car");
         driver.uses(rental, "User parks a car");
         driver.uses(billing, "User asks for current cost");
 
-        rental.uses(locator, "Gets travelled distance"); //or listens to events?
-        rental.uses(locator, "Sends events on rent/return");
-        rental.uses(billing, "Sends events on rent/return");
-        rental.uses(cars, "Gets details of a car");
+
+        locator.uses(rental, "New position with distance from last (Event)");
+        locator.uses(billing, "New position with distance from last (Event)");
+        locator.uses(search, "New position with distance from last (Event)");
+
+        rental.uses(billing, "Rent (Event)");
+        rental.uses(billing, "Return (Event)");
+        rental.uses(availability, "Rent (Event)");
+        rental.uses(availability, "Return (Event)");
+
+        rental.uses(cars, "Gets details of a car by carId");
         billing.uses(users, "Get billing address of a user");
+        billing.uses(mailing, "Billing email (Event)");
 
         // define some views (the diagrams you would like to see)
         ViewSet views = workspace.getViews();
         EnterpriseContextView contextView = views.createEnterpriseContextView("SystemContext", "An example of a System Context diagram.");
-        contextView.setPaperSize(PaperSize.A5_Landscape);
+        contextView.setPaperSize(PaperSize.A4_Landscape);
         contextView.addAllSoftwareSystems();
         contextView.addAllPeople();
 
