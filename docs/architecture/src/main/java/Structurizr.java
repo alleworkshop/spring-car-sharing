@@ -13,12 +13,15 @@ import com.structurizr.view.ViewSet;
 import java.io.InputStream;
 import java.util.Properties;
 
+import static com.structurizr.model.InteractionStyle.Asynchronous;
 import static java.lang.Long.parseLong;
 
 /**
  * This is a simple example of how to get started with Structurizr for Java.
  */
 public class Structurizr {
+    static String eventTechnology = "EventBus";
+
 
     public static void main(String[] args) throws Exception {
         // a Structurizr workspace is the wrapper for a software architecture model, views and documentation
@@ -52,18 +55,18 @@ public class Structurizr {
         driver.uses(billing, "User asks for current cost");
 
 
-        locator.uses(rental, "New position with distance from last (Event)");
-        locator.uses(billing, "New position with distance from last (Event)");
-        locator.uses(search, "New position with distance from last (Event)");
+        locator.uses(rental, "New position with distance from last", eventTechnology, Asynchronous);
+        locator.uses(billing, "New position with distance from last", eventTechnology, Asynchronous);
+        locator.uses(search, "New position with distance from last", eventTechnology, Asynchronous);
 
-        rental.uses(billing, "Rent (Event)");
-        rental.uses(billing, "Return (Event)");
-        rental.uses(availability, "Rent (Event)");
-        rental.uses(availability, "Return (Event)");
+        rental.uses(billing, "Rent", eventTechnology, Asynchronous);
+        rental.uses(billing, "Return", eventTechnology, Asynchronous);
+        rental.uses(availability, "Rent", eventTechnology, Asynchronous);
+        rental.uses(availability, "Return", eventTechnology, Asynchronous);
 
         rental.uses(cars, "Gets details of a car by carId");
         billing.uses(users, "Get billing address of a user");
-        billing.uses(mailing, "Billing email (Event)");
+        billing.uses(mailing, "Billing email", eventTechnology, Asynchronous);
 
         // define some views (the diagrams you would like to see)
         ViewSet views = workspace.getViews();
