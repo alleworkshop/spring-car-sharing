@@ -1,5 +1,8 @@
 buildscript {
 	ext {
+		versions = [
+				spock      : '1.1-groovy-2.4'
+		]
 		springBootVersion = '2.0.0.M7'
 	}
 	repositories {
@@ -37,8 +40,24 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-webflux')
 	runtime('com.h2database:h2')
 	compileOnly('org.projectlombok:lombok')
+
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('de.flapdoodle.embed:de.flapdoodle.embed.mongo')
 	testCompile('io.projectreactor:reactor-test')
 	testCompile('org.springframework.security:spring-security-test')
+	testCompile "cglib:cglib-nodep:3.2.5"
+	testCompile "org.spockframework:spock-core:$versions.spock"
+	testCompile "org.spockframework:spock-spring:$versions.spock"
+	testCompile "org.springframework:spring-test"
+}
+
+tasks.withType(GroovyCompile) {
+	groovyOptions.optimizationOptions.indy = true
+	options.encoding = 'UTF-8'
+}
+
+compileJava {
+	options.incremental = true
+	options.compilerArgs << '-parameters'
+	options.compilerArgs << '-Xlint:unchecked'
 }
