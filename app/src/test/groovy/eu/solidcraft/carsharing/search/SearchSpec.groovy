@@ -5,19 +5,26 @@ import eu.solidcraft.carsharing.search.dto.LocationDto
 import spock.lang.Specification
 
 class SearchSpec extends Specification {
-    BigDecimal lat = 40.741895
-    BigDecimal lon = -73.989308
-    SearchFacade searchFacade = new SearchConfiguration().facade()
+    SearchFacade searchFacade = new SearchTestConfiguration().facade()
 
+    LocationDto userLocation = new LocationDto(40.741895, -73.989308)
 
     def "should return location of nearest car"() {
-        given: "there are cars parked nearby"
+        given:
+            carsAreParked([
+                    new TestCar(gpsId: '1', name: 'Mercedes', currentLocation: userLocation.shift(1, 0)),
+                    new TestCar(gpsId: '2', name: 'BMW', currentLocation: userLocation.shift(2, 0))]) //TODO: builders
 
-        when: "user searches for cars nearby by sending his location (lon/lat)"
-            List<CarDto> carsFound = searchFacade.findCarsNearby(new LocationDto(lat, lon))
-                .collectList().block()
+        when:
+            List<CarDto> carsFound = searchFacade.findCarsNearby(userLocation)
+                    .collectList().block()
 
-        then: "system returns list of nearby cars"
+        then: "system returns a nearest car"
+            carsFound.name == ['Mercedes']
+    }
+
+    void carsAreParked(List<TestCar> cars) {
+        cars.forEach { searchFacade.onCarLocationChanged(it.gpsId, it.currentLocation).block() }
     }
 
     def "no cars nearby"() {
