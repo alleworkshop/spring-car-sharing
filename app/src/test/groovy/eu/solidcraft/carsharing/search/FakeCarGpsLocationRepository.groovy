@@ -4,7 +4,6 @@ import eu.solidcraft.carsharing.search.dto.LocationDto
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
-//@CompileStatic
 class FakeCarGpsLocationRepository implements CarGpsLocationRepository {
 
     private final Map<String, LocationDto> carLocations = new HashMap<>()

@@ -14,9 +14,11 @@ public class SearchFacade {
 
     CarGpsLocationRepository carGpsLocationRepository;
 
+    CarsCatalog carsCatalog;
+
     public Flux<CarDto> findCarsNearby(LocationDto location) {
         return carGpsLocationRepository.findNearestFrom(location)
-                .map(gpsLocation -> new CarDto(""));
+                .flatMap(gpsLocation -> carsCatalog.findCarDetailsByGpsId(gpsLocation.getGpsId()));
     }
 
     public Mono<Void> onCarLocationChanged(String gpsId, LocationDto location) {

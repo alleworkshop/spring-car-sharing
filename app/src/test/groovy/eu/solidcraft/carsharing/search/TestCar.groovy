@@ -6,5 +6,4 @@ class TestCar {
     String gpsId
     String name
     LocationDto currentLocation
-
 }

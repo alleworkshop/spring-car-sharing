@@ -5,9 +5,15 @@ import eu.solidcraft.carsharing.search.dto.LocationDto
 import spock.lang.Specification
 
 class SearchSpec extends Specification {
-    SearchFacade searchFacade = new SearchTestConfiguration().facade()
+    SearchTestConfiguration config = new SearchTestConfiguration()
+    SearchFacade searchFacade = config.facade()
+    FakeCarsCatalog carsCatalog = config.carsCatalog()
 
     LocationDto userLocation = new LocationDto(40.741895, -73.989308)
+
+    def setup() {
+        carsCatalog.clear()
+    }
 
     def "should return location of nearest car"() {
         given:
@@ -24,7 +30,10 @@ class SearchSpec extends Specification {
     }
 
     void carsAreParked(List<TestCar> cars) {
-        cars.forEach { searchFacade.onCarLocationChanged(it.gpsId, it.currentLocation).block() }
+        cars.forEach {
+            carsCatalog.save(it.gpsId, it.name)
+            searchFacade.onCarLocationChanged(it.gpsId, it.currentLocation).block()
+        }
     }
 
     def "no cars nearby"() {
