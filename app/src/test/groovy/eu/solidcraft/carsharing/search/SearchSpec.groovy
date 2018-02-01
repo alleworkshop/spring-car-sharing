@@ -18,8 +18,9 @@ class SearchSpec extends Specification {
     def "should return location of nearest car"() {
         given:
             carsAreParked([
-                    new TestCar(gpsId: '1', name: 'Mercedes', currentLocation: userLocation.shift(1, 0)),
-                    new TestCar(gpsId: '2', name: 'BMW', currentLocation: userLocation.shift(2, 0))]) //TODO: builders
+                    new TestCar(gpsId: '1', name: 'Jaguar', currentLocation: userLocation.shift(3, 1)),
+                    new TestCar(gpsId: '2', name: 'Mercedes', currentLocation: userLocation.shift(1, 0)),
+                    new TestCar(gpsId: '3', name: 'BMW', currentLocation: userLocation.shift(1, 2))]) //TODO: builders
 
         when:
             List<CarDto> carsFound = searchFacade.findCarsNearby(userLocation)
