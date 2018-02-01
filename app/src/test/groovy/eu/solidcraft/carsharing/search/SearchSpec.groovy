@@ -4,6 +4,8 @@ import eu.solidcraft.carsharing.search.dto.CarDto
 import eu.solidcraft.carsharing.search.dto.LocationDto
 import spock.lang.Specification
 
+import static eu.solidcraft.carsharing.search.TestCar.aCar
+
 class SearchSpec extends Specification {
     SearchTestConfiguration config = new SearchTestConfiguration()
     SearchFacade searchFacade = config.facade()
@@ -18,9 +20,9 @@ class SearchSpec extends Specification {
     def "should return location of nearest car"() {
         given:
             carsAreParked([
-                    new TestCar(gpsId: '1', name: 'Jaguar', currentLocation: userLocation.shift(3, 1)),
-                    new TestCar(gpsId: '2', name: 'Mercedes', currentLocation: userLocation.shift(1, 0)),
-                    new TestCar(gpsId: '3', name: 'BMW', currentLocation: userLocation.shift(1, 2))]) //TODO: builders
+                    aCar(name: 'Jaguar', currentLocation: userLocation.shift(3, 1)),
+                    aCar(name: 'Mercedes', currentLocation: userLocation.shift(1, 0)),
+                    aCar(name: 'BMW', currentLocation: userLocation.shift(1, 2))])
 
         when:
             List<CarDto> carsFound = searchFacade.findCarsNearby(userLocation)
