@@ -2,7 +2,7 @@ package eu.solidcraft.carsharing.search
 
 import eu.solidcraft.carsharing.search.dto.LocationDto
 
-class TestCar {
+class TestCarBuilder {
     String gpsId
     String name
     LocationDto currentLocation
@@ -12,10 +12,10 @@ class TestCar {
             currentLocation: new LocationDto(0, 0)
     ]
 
-    static TestCar aCar(Map properties) {
+    static TestCarBuilder aCar(Map properties) {
         properties = DEFAULTS + properties
 
-        new TestCar(gpsId: UUID.randomUUID().toString(),
+        new TestCarBuilder(gpsId: UUID.randomUUID().toString(),
                 name: properties.name,
                 currentLocation: properties.currentLocation)
     }

@@ -4,12 +4,11 @@ import eu.solidcraft.carsharing.search.dto.CarDto
 import eu.solidcraft.carsharing.search.dto.LocationDto
 import spock.lang.Specification
 
-import static eu.solidcraft.carsharing.search.TestCar.aCar
+import static TestCarBuilder.aCar
 
 class SearchSpec extends Specification {
-    SearchTestConfiguration config = new SearchTestConfiguration()
-    SearchFacade searchFacade = config.facade()
-    FakeCarsCatalog carsCatalog = config.carsCatalog()
+    SearchFacade searchFacade = SearchTestConfiguration.facade()
+    FakeCarsCatalog carsCatalog = SearchTestConfiguration.carsCatalog()
 
     LocationDto userLocation = new LocationDto(40.741895, -73.989308)
 
@@ -32,7 +31,7 @@ class SearchSpec extends Specification {
             carsFound.name == ['Mercedes']
     }
 
-    void carsAreParked(List<TestCar> cars) {
+    void carsAreParked(List<TestCarBuilder> cars) {
         cars.forEach {
             carsCatalog.save(it.gpsId, it.name)
             searchFacade.onCarLocationChanged(it.gpsId, it.currentLocation).block()

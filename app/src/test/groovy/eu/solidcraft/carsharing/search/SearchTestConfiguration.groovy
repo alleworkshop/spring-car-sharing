@@ -2,13 +2,15 @@ package eu.solidcraft.carsharing.search
 
 class SearchTestConfiguration {
 
-    FakeCarsCatalog carsCatalog = new FakeCarsCatalog()
+    private static SearchConfiguration configuration = new SearchConfiguration()
 
-    SearchFacade facade() {
-        new SearchFacade(new FakeCarGpsLocationRepository(), carsCatalog)
+    private static FakeCarsCatalog carsCatalog = new FakeCarsCatalog()
+
+    static SearchFacade facade() {
+        configuration.facade(new FakeCarGpsLocationRepository(), carsCatalog())
     }
 
-    FakeCarsCatalog carsCatalog() {
+    static FakeCarsCatalog carsCatalog() {
         carsCatalog
     }
 }
