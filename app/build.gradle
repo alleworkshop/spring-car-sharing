@@ -1,7 +1,8 @@
 buildscript {
 	ext {
 		versions = [
-				spock      : '1.1-groovy-2.4'
+				spock         : '1.1-groovy-2.4',
+				springWiremock: '1.2.3.RELEASE'
 		]
 		springBootVersion = '2.0.0.M7'
 	}
@@ -49,6 +50,7 @@ dependencies {
 	testCompile "org.spockframework:spock-core:$versions.spock"
 	testCompile "org.spockframework:spock-spring:$versions.spock"
 	testCompile "org.springframework:spring-test"
+//	testCompile "org.springframework.cloud:spring-cloud-contract-wiremock:$versions.springWiremock"
 }
 
 tasks.withType(GroovyCompile) {
