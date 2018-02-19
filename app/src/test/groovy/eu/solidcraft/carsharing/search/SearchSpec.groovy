@@ -1,43 +1,61 @@
 package eu.solidcraft.carsharing.search
 
+import eu.solidcraft.carsharing.availability.AvailabilityFacade
+import eu.solidcraft.carsharing.base.SampleCar
 import eu.solidcraft.carsharing.car.CarsFacade
 import eu.solidcraft.carsharing.car.dto.CarDto
-import eu.solidcraft.carsharing.kernel.CarId
-import eu.solidcraft.carsharing.kernel.GpsId
 import eu.solidcraft.carsharing.kernel.Location
 import eu.solidcraft.carsharing.locator.dto.LocationChangeEvent
 import eu.solidcraft.carsharing.search.dto.CarInLocationDto
 import reactor.core.publisher.Mono
 import spock.lang.Specification
 
+import static eu.solidcraft.carsharing.base.SampleCar.car
 import static eu.solidcraft.carsharing.base.extract.ReactiveExtractor.extract
 
 class SearchSpec extends Specification {
-    Location userLocation = new Location(40.741895, -73.989308)
-    GpsId gpsId = new GpsId("tesla3gps")
-    CarId carId = new CarId("myTesla3")
     CarsFacade carsFacade = Stub()
-    SearchFacade searchFacade = new SearchConfiguration().facade(carsFacade)
+    AvailabilityFacade availabilityFacade = Stub()
+    SearchFacade searchFacade = new SearchConfiguration().facade(carsFacade, availabilityFacade)
+    SampleCar A = car(), B = car(), C = car(), D = car()
 
-    def "should return location of nearest car"() {
-        given: "there is a car parked nearby"
-            searchFacade.newPosition(new LocationChangeEvent(userLocation, gpsId))
+    def "should return locations of nearest cars"() {
+        given: "there are cars A(2,2), B(1,1), C(2,2), D(400,400)"
+            [A(2,2), B(1,1), C(2,2), D(400,400)]
+            locationsDetected([A, B, C, D])
+            registered([A, B, C, D])
 
-        and: "gpsId points to tesla"
-            carsFacade.findCarByGps(gpsId) >> Mono.just(new CarDto(carId))
+        and: "user is at location (0,0)"
+            Location userLocation = new Location(0, 0)
+
+        and: "A, B are available"
+            available(A, B)
 
         when: "user searches for cars nearby by sending his location (lon/lat)"
             List<CarInLocationDto> carsFound =
-                    extract(searchFacade.findCarsNearby(userLocation))
+                extract(searchFacade.findCarsNearby(userLocation))
 
-        then: "system returns tesla in location nearby"
-            CarInLocationDto foundCar = carsFound.first()
-            foundCar.carId == carId
-            foundCar.getLocation() == userLocation
+        then: "system returns [B, A] (sorted by distance)"
+            carsFound.carId == [B, A].carId
     }
 
-    def "should return locations of nearest cars"() {
+    private void available(SampleCar... sampleCars) {
+        sampleCars.each {
+            availabilityFacade.isAvailable(it.carId) >> Mono.just(true)
+        }
+        availabilityFacade.isAvailable(_) >> Mono.just(false)
+    }
 
+    private void locationsDetected(List<SampleCar> sampleCars) {
+        sampleCars.each {
+            searchFacade.newPosition(new LocationChangeEvent(it.location, it.gpsId))
+        }
+    }
+
+    private void registered(List<SampleCar> sampleCars) {
+        sampleCars.each {
+            carsFacade.findCarByGps(it.gpsId) >> Mono.just(new CarDto(it.carId))
+        }
     }
 
     def "no cars nearby"() {

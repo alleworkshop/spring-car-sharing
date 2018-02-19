@@ -1,5 +1,6 @@
 package eu.solidcraft.carsharing.search;
 
+import eu.solidcraft.carsharing.availability.AvailabilityFacade;
 import eu.solidcraft.carsharing.car.CarsFacade;
 import eu.solidcraft.carsharing.car.dto.CarDto;
 import eu.solidcraft.carsharing.kernel.Location;
@@ -18,15 +19,21 @@ import reactor.core.publisher.Mono;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SearchFacade {
     @NonNull CarsFacade carsFacade;
+    @NonNull AvailabilityFacade availabilityFacade;
     @NonNull CarLocationRepository store;
 
     public Flux<CarInLocationDto> findCarsNearby(Location location) {
         Flux<GpsNearby> gpsesNearby = store.findNearby(location);
-        Flux<CarInLocationDto> carDtoFlux = gpsesNearby.flatMap((GpsNearby gpsLocation) -> {
-            Mono<CarDto> carByGps = carsFacade.findCarByGps(gpsLocation.getGpsId());
-            return carByGps.map(carDto -> new CarInLocationDto(carDto.getCarId(), gpsLocation.getLocation()));
-        });
-        return carDtoFlux;
+        Flux<CarInLocationDto> carsNearby = gpsesNearby.flatMap((gpsLocation) ->
+                findCarNearby(gpsLocation));
+        Flux<CarInLocationDto> availableCars = carsNearby.filterWhen(carDto ->
+                availabilityFacade.isAvailable(carDto.getCarId()));
+        return availableCars;
+    }
+
+    private Mono<CarInLocationDto> findCarNearby(GpsNearby gpsLocation) {
+        Mono<CarDto> carByGps = carsFacade.findCarByGps(gpsLocation.getGpsId());
+        return carByGps.map(carDto -> new CarInLocationDto(carDto.getCarId(), gpsLocation.getLocation()));
     }
 
     @EventListener

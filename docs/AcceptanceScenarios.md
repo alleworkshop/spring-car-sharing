@@ -6,11 +6,15 @@ User app sends user id and gps coordination, system returns location of nearest 
 
 ### Acceptance scenario
 
-Given there are cars parked nearby
+Given there are cars A(2,2), B(1,1), C(2,2), D(4,4)
+
+And user is at (0,0)
+
+And A, B are available
 
 When user searches for cars nearby by sending his location (lon/lat)
 
-Then system returns list of nearby cars
+Then system returns [B, A] (sorted by distance)
 
 ### Alternative scenarios
 

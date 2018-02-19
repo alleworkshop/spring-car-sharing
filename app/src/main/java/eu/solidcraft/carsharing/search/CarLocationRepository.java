@@ -41,6 +41,7 @@ class BruteForceCarLocationRepository implements CarLocationRepository {
                 .map((Map.Entry<GpsId, Location> entry) ->
                         new GpsNearby(entry.getKey(), entry.getValue(), userLocation.distanceTo(entry.getValue())));
         Stream<GpsNearby> closest10Gpses = gpsLocationStream.sorted(Comparator.comparing(GpsNearby::getDistanceFormUser))
+                .filter(gpsNearby -> gpsNearby.withinRadius(4))
                 .limit(10);
         return Flux.fromStream(closest10Gpses);
     }
@@ -65,4 +66,8 @@ class GpsNearby {
     @Getter GpsId gpsId;
     @Getter Location location;
     @Getter BigDecimal distanceFormUser;
+
+    boolean withinRadius(int maxRange) {
+        return distanceFormUser.intValue() <= maxRange;
+    }
 }
