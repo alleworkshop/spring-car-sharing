@@ -1,14 +1,12 @@
-package eu.solidcraft.carsharing.search.dto;
+package eu.solidcraft.carsharing.car.dto;
 
+import eu.solidcraft.carsharing.kernel.CarId;
 import lombok.AccessLevel;
 import lombok.Value;
 import lombok.experimental.FieldDefaults;
 
-import java.math.BigDecimal;
-
 @Value
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class LocationDto {
-    BigDecimal lat;
-    BigDecimal lon;
+public class CarDto {
+    CarId carId;
 }

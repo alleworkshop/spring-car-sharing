@@ -1,8 +1,11 @@
-package eu.solidcraft.carsharing.search.dto;
+package eu.solidcraft.carsharing.kernel;
 
 import lombok.AccessLevel;
+import lombok.Value;
 import lombok.experimental.FieldDefaults;
 
+@Value
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class CarDto {
+public class GpsId {
+    String id;
 }

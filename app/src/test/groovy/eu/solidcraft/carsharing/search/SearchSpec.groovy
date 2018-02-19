@@ -1,23 +1,43 @@
 package eu.solidcraft.carsharing.search
 
-import eu.solidcraft.carsharing.search.dto.CarDto
-import eu.solidcraft.carsharing.search.dto.LocationDto
+import eu.solidcraft.carsharing.car.CarsFacade
+import eu.solidcraft.carsharing.car.dto.CarDto
+import eu.solidcraft.carsharing.kernel.CarId
+import eu.solidcraft.carsharing.kernel.GpsId
+import eu.solidcraft.carsharing.kernel.Location
+import eu.solidcraft.carsharing.locator.dto.LocationChangeEvent
+import eu.solidcraft.carsharing.search.dto.CarInLocationDto
+import reactor.core.publisher.Mono
 import spock.lang.Specification
 
-class SearchSpec extends Specification {
-    BigDecimal lat = 40.741895
-    BigDecimal lon = -73.989308
-    SearchFacade searchFacade = new SearchConfiguration().facade()
+import static eu.solidcraft.carsharing.base.extract.ReactiveExtractor.extract
 
+class SearchSpec extends Specification {
+    Location userLocation = new Location(40.741895, -73.989308)
+    GpsId gpsId = new GpsId("tesla3gps")
+    CarId carId = new CarId("myTesla3")
+    CarsFacade carsFacade = Stub()
+    SearchFacade searchFacade = new SearchConfiguration().facade(carsFacade)
 
     def "should return location of nearest car"() {
-        given: "there are cars parked nearby"
+        given: "there is a car parked nearby"
+            searchFacade.newPosition(new LocationChangeEvent(userLocation, gpsId))
+
+        and: "gpsId points to tesla"
+            carsFacade.findCarByGps(gpsId) >> Mono.just(new CarDto(carId))
 
         when: "user searches for cars nearby by sending his location (lon/lat)"
-            List<CarDto> carsFound = searchFacade.findCarsNearby(new LocationDto(lat, lon))
-                .collectList().block()
+            List<CarInLocationDto> carsFound =
+                    extract(searchFacade.findCarsNearby(userLocation))
 
-        then: "system returns list of nearby cars"
+        then: "system returns tesla in location nearby"
+            CarInLocationDto foundCar = carsFound.first()
+            foundCar.carId == carId
+            foundCar.getLocation() == userLocation
+    }
+
+    def "should return locations of nearest cars"() {
+
     }
 
     def "no cars nearby"() {

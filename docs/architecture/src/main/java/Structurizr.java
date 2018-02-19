@@ -1,20 +1,13 @@
-import com.structurizr.Workspace;
-import com.structurizr.api.StructurizrClient;
-import com.structurizr.model.Model;
-import com.structurizr.model.Person;
-import com.structurizr.model.SoftwareSystem;
-import com.structurizr.model.Tags;
-import com.structurizr.view.EnterpriseContextView;
-import com.structurizr.view.PaperSize;
-import com.structurizr.view.Shape;
-import com.structurizr.view.Styles;
-import com.structurizr.view.ViewSet;
+import com.structurizr.*;
+import com.structurizr.api.*;
+import com.structurizr.model.*;
+import com.structurizr.view.*;
 
-import java.io.InputStream;
-import java.util.Properties;
+import java.io.*;
+import java.util.*;
 
-import static com.structurizr.model.InteractionStyle.Asynchronous;
-import static java.lang.Long.parseLong;
+import static com.structurizr.model.InteractionStyle.*;
+import static java.lang.Long.*;
 
 /**
  * This is a simple example of how to get started with Structurizr for Java.
@@ -31,7 +24,7 @@ public class Structurizr {
         // add some elements to your software architecture model
         Person driver = model.addPerson("Driver", "A user that rents and drives a car");
         SoftwareSystem users = model.addSoftwareSystem(
-                "users", "Responsible for authentication, authorization and user profiles");
+               "users", "Responsible for authentication, authorization and user profiles");
         SoftwareSystem locator = model.addSoftwareSystem("locator", "Responsible for locating cars and calculating distance (no storage)");
         SoftwareSystem cars = model.addSoftwareSystem("cars", "Responsible for car catalog (DB)");
         SoftwareSystem rental = model.addSoftwareSystem("rental", "Responsible for renting of cars (DB)");
