@@ -9,6 +9,10 @@ import java.math.BigDecimal;
 @Value
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class Location {
+    public static Location of(BigDecimal lat, BigDecimal lon) {
+        return new Location(lat, lon);
+    }
+
     BigDecimal lat;
     BigDecimal lon;
 

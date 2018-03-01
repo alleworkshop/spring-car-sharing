@@ -11,21 +11,14 @@ class SampleCar {
     GpsId gpsId;
     Location location
 
-    SampleCar(String id) {
-        this.carId = new CarId(id)
+    SampleCar(BigDecimal lat, BigDecimal lon) {
+        String id = UUID.randomUUID().toString()
+        carId = new CarId(id)
         gpsId = new GpsId(id)
+        location = new Location(lat, lon)
     }
 
-    SampleCar call(int lat, int lon) {
-        location = new Location(BigDecimal.valueOf(lat), BigDecimal.valueOf(lon))
-        return this
-    }
-
-    static SampleCar car(String id) {
-        return new SampleCar(id)
-    }
-
-    static SampleCar car() {
-        return new SampleCar(UUID.randomUUID().toString())
+    static SampleCar car(BigDecimal lat, BigDecimal lon) {
+        return new SampleCar(lat, lon)
     }
 }
